@@ -1,0 +1,53 @@
+/* style.css */
+:root {
+    --primary: #ff4d6d;
+    --secondary: #ff8fa3;
+    --bg: #fff0f3;
+    --text: #590d22;
+}
+
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+}
+
+button {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin: 10px;
+}
+
+button:hover {
+    transform: scale(1.1);
+    background: #c9184a;
+}
+/* Add this to style.css */
+
+#noBtn {
+    position: absolute; /* Allows it to move freely */
+    transition: 0.3s ease; /* Makes the movement smooth/continuous */
+}
+
+/* Ensure the container for buttons has space */
+.buttons {
+    min-height: 100px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
