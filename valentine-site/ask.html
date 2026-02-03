@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will you be my Valentine?</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #fff0f3;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; 
+            transition: background-color 1s ease;
+        }
+
+        h1 {
+            color: #d62828;
+            font-size: 3rem;
+            margin-bottom: 30px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            /* We remove relative positioning so fixed elements work better */
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease; 
+            white-space: nowrap; 
+        }
+
+        #yesBtn {
+            background-color: #2b9348;
+            color: white;
+            z-index: 10; /* Ensures Yes stays on top if they overlap */
+        }
+
+        #yesBtn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px #2b9348;
+        }
+
+        #noBtn {
+            background-color: #d00000;
+            color: white;
+            
+            /* FIXED POSITIONING: Guarantees it is on screen */
+            position: fixed; 
+            
+            /* STARTING POSITION: Slightly to the right of center */
+            top: 55%;
+            left: 55%;
+            
+            /* Smooth gliding movement */
+            transition: top 0.4s ease, left 0.4s ease; 
+            z-index: 5;
+        }
+
+        #success-message {
+            display: none;
+            text-align: center;
+            z-index: 20;
+            position: relative;
+        }
+        
+        #success-message img {
+            width: 300px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="question-container">
+        <h1>Will you be my Valentine? 🌹</h1>
+        
+        <div class="buttons">
+            <button id="yesBtn" onclick="clickYes()">YES</button>
+            <button id="noBtn" onmouseover="moveButton()" onclick="moveButton()">NO</button>
+        </div>
+    </div>
+
+    <div id="success-message">
+        <img src="https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif" alt="Happy">
+        <h2>YAYYY! I knew it! ❤️</h2>
+        <p>I have a special date planned for us.</p>
+    </div>
+
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const questionContainer = document.getElementById('question-container');
+        const successMessage = document.getElementById('success-message');
+
+        function moveButton() {
+            // 1. Calculate random position within the visible window
+            // We subtract the button size (approx 100px) so it doesn't go off the edge
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = Math.random() * (window.innerHeight - 50);
+            
+            // 2. Apply new position
+            noBtn.style.left = `${x}px`;
+            noBtn.style.top = `${y}px`;
+
+            // 3. Make YES button bigger
+            // We read the current size and multiply it
+            let currentSize = parseFloat(window.getComputedStyle(yesBtn).fontSize);
+            let newSize = currentSize * 1.2; 
+            yesBtn.style.fontSize = newSize + "px";
+            
+            // Increase padding to keep it looking nice
+            let currentPad = parseFloat(window.getComputedStyle(yesBtn).paddingTop);
+            yesBtn.style.padding = (currentPad * 1.1) + "px " + (currentPad * 2.5) + "px";
+        }
+
+        function clickYes() {
+            questionContainer.style.display = 'none';
+            noBtn.style.display = 'none';
+            successMessage.style.display = 'block';
+            document.body.style.backgroundColor = "#ffc8dd";
+
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            setTimeout(() => {
+                confetti({ particleCount: 50, angle: 60, spread: 55, origin: { x: 0 } });
+                confetti({ particleCount: 50, angle: 120, spread: 55, origin: { x: 1 } });
+            }, 500);
+        }
+    </script>
+
+</body>
+</html>
