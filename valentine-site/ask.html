@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Will you be my Valentine?</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
@@ -17,24 +22,23 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            overflow: hidden; 
+            overflow: hidden;
+            text-align: center;
             transition: background-color 1s ease;
         }
 
         h1 {
             color: #d62828;
             font-size: 3rem;
-            margin-bottom: 30px;
-            text-align: center;
+            margin-bottom: 20px;
             z-index: 10;
         }
 
         .buttons {
             display: flex;
             gap: 20px;
-            justify-content: center;
             align-items: center;
-            /* We remove relative positioning so fixed elements work better */
+            justify-content: center;
         }
 
         button {
@@ -44,106 +48,218 @@
             border-radius: 50px;
             cursor: pointer;
             font-weight: bold;
-            transition: all 0.3s ease; 
-            white-space: nowrap; 
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            z-index: 10;
         }
 
-        #yesBtn {
-            background-color: #2b9348;
-            color: white;
-            z-index: 10; /* Ensures Yes stays on top if they overlap */
-        }
-
-        #yesBtn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 20px #2b9348;
-        }
-
-        #noBtn {
-            background-color: #d00000;
-            color: white;
-            
-            /* FIXED POSITIONING: Guarantees it is on screen */
-            position: fixed; 
-            
-            /* STARTING POSITION: Slightly to the right of center */
-            top: 55%;
-            left: 55%;
-            
-            /* Smooth gliding movement */
-            transition: top 0.4s ease, left 0.4s ease; 
-            z-index: 5;
-        }
-
-        #success-message {
-            display: none;
-            text-align: center;
-            z-index: 20;
-            position: relative;
+        #yesBtn { 
+            background-color: #2b9348; 
+            color: white; 
         }
         
-        #success-message img {
-            width: 300px;
+        #yesBtn:hover { 
+            transform: scale(1.1); 
+            box-shadow: 0 0 20px #2b9348;
+        }
+        
+        #noBtn { 
+            background-color: #d00000; 
+            color: white; 
+            position: fixed;
+            top: 55%;
+            left: 55%;
+            transition: top 0.4s ease, left 0.4s ease;
+        }
+
+        /* CAMERA CONTAINER */
+        #camera-container {
+            display: none;
+            position: relative;
+            width: 90%;
+            max-width: 640px;
+            height: auto;
+            aspect-ratio: 4/3;
+            background: black;
             border-radius: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        video {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            transform: scaleX(-1);
+            object-fit: cover;
+        }
+
+        #camera-instruction {
+            color: #590d22;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            display: none;
+            animation: pulse 2s infinite;
+        }
+
+        #final-message {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(255, 77, 109, 0.5);
+            z-index: 100;
+            width: 80%;
+            max-width: 600px;
+        }
+        
+        #final-message h2 { color: #ff4d6d; font-size: 3rem; margin: 0; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 <body>
 
-    <div class="container" id="question-container">
+    <div id="question-box">
         <h1>Will you be my Valentine? 🌹</h1>
-        
         <div class="buttons">
-            <button id="yesBtn" onclick="clickYes()">YES</button>
-            <button id="noBtn" onmouseover="moveButton()" onclick="moveButton()">NO</button>
+            <button id="yesBtn" onclick="startCameraSequence()">YES</button>
+            <button id="noBtn" onmouseover="moveNo()" onclick="moveNo()">NO</button>
         </div>
     </div>
 
-    <div id="success-message">
-        <img src="https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif" alt="Happy">
-        <h2>YAYYY! I knew it! ❤️</h2>
-        <p>I have a special date planned for us.</p>
+    <h2 id="camera-instruction">Show me the "I LOVE YOU" sign! 🤟</h2>
+    <div id="camera-container">
+        <video id="input_video" autoplay playsinline></video>
+        <canvas id="output_canvas" style="display:none;"></canvas>
+    </div>
+
+    <div id="final-message">
+        <h2>I LOVE YOU TOO! ❤️</h2>
+        <p>You unlocked my heart.</p>
+        <img src="https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif" width="300">
     </div>
 
     <script>
-        const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
-        const questionContainer = document.getElementById('question-container');
-        const successMessage = document.getElementById('success-message');
+        const noBtn = document.getElementById('noBtn');
+        const questionBox = document.getElementById('question-box');
+        const cameraContainer = document.getElementById('camera-container');
+        const instruction = document.getElementById('camera-instruction');
+        const videoElement = document.getElementById('input_video');
+        const finalMessage = document.getElementById('final-message');
 
-        function moveButton() {
-            // 1. Calculate random position within the visible window
-            // We subtract the button size (approx 100px) so it doesn't go off the edge
-            const x = Math.random() * (window.innerWidth - 100);
-            const y = Math.random() * (window.innerHeight - 50);
-            
-            // 2. Apply new position
+        // --- 1. RUNNING NO + GROWING YES ---
+        function moveNo() {
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
             noBtn.style.left = `${x}px`;
             noBtn.style.top = `${y}px`;
 
-            // 3. Make YES button bigger
-            // We read the current size and multiply it
             let currentSize = parseFloat(window.getComputedStyle(yesBtn).fontSize);
-            let newSize = currentSize * 1.2; 
-            yesBtn.style.fontSize = newSize + "px";
-            
-            // Increase padding to keep it looking nice
+            yesBtn.style.fontSize = (currentSize * 1.2) + "px";
             let currentPad = parseFloat(window.getComputedStyle(yesBtn).paddingTop);
             yesBtn.style.padding = (currentPad * 1.1) + "px " + (currentPad * 2.5) + "px";
         }
 
-        function clickYes() {
-            questionContainer.style.display = 'none';
+        // --- 2. CAMERA & AI LOGIC ---
+        let camera;
+        let isSuccess = false;
+
+        function startCameraSequence() {
+            questionBox.style.display = 'none';
             noBtn.style.display = 'none';
-            successMessage.style.display = 'block';
+            instruction.style.display = 'block';
+            cameraContainer.style.display = 'block';
+
+            const hands = new Hands({locateFile: (file) => {
+                return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+            }});
+            
+            hands.setOptions({
+                maxNumHands: 1,
+                modelComplexity: 1,
+                minDetectionConfidence: 0.5,
+                minTrackingConfidence: 0.5
+            });
+
+            hands.onResults(onResults);
+
+            camera = new Camera(videoElement, {
+                onFrame: async () => {
+                    await hands.send({image: videoElement});
+                },
+                width: 640,
+                height: 480
+            });
+            camera.start();
+        }
+
+        function onResults(results) {
+            if (isSuccess) return;
+
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const landmarks = results.multiHandLandmarks[0];
+
+                // FINGER TIPS
+                const thumbTip = landmarks[4].y;
+                const indexTip = landmarks[8].y;
+                const middleTip = landmarks[12].y;
+                const ringTip = landmarks[16].y;
+                const pinkyTip = landmarks[20].y;
+
+                // FINGER JOINTS (PIP - Proximal Interphalangeal)
+                // We use these to check if fingers are folded down
+                const middlePip = landmarks[10].y;
+                const ringPip = landmarks[14].y;
+                const indexPip = landmarks[6].y;
+                const pinkyPip = landmarks[18].y;
+
+                // LOGIC FOR "I LOVE YOU" (🤟)
+                // 1. Index & Pinky are UP (Tip is HIGHER than Joint... remember Y goes down in canvas)
+                //    So Tip < Joint
+                const indexIsUp = indexTip < indexPip;
+                const pinkyIsUp = pinkyTip < pinkyPip;
+
+                // 2. Middle & Ring are DOWN (Tip is LOWER than Joint)
+                //    So Tip > Joint
+                const middleIsDown = middleTip > middlePip;
+                const ringIsDown = ringTip > ringPip;
+
+                // 3. Thumb is extended (optional check, but usually thumbTip is high)
+
+                if (indexIsUp && pinkyIsUp && middleIsDown && ringIsDown) {
+                    triggerSuccess();
+                }
+            }
+        }
+
+        function triggerSuccess() {
+            isSuccess = true;
+            
+            // Stop Camera
+            if (videoElement.srcObject) {
+                videoElement.srcObject.getTracks().forEach(track => track.stop());
+            }
+
+            cameraContainer.style.display = 'none';
+            instruction.style.display = 'none';
+            finalMessage.style.display = 'block';
             document.body.style.backgroundColor = "#ffc8dd";
 
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
             setTimeout(() => {
-                confetti({ particleCount: 50, angle: 60, spread: 55, origin: { x: 0 } });
-                confetti({ particleCount: 50, angle: 120, spread: 55, origin: { x: 1 } });
+                confetti({ particleCount: 100, angle: 60, spread: 55, origin: { x: 0 } });
+                confetti({ particleCount: 100, angle: 120, spread: 55, origin: { x: 1 } });
             }, 500);
         }
     </script>
