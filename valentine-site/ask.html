@@ -138,12 +138,34 @@
     margin-left: auto;       /* Centers it */
     margin-right: auto;      /* Centers it */
 }
+/* TIMER STYLE */
+#love-timer {
+    font-size: 1.2rem;
+    color: #590d22;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+#timer-display {
+    font-size: 1.5rem;
+    color: #d62828;
+    background: rgba(255, 255, 255, 0.5);
+    padding: 10px 20px;
+    border-radius: 50px;
+    display: inline-block;
+    margin-top: 5px;
+    border: 2px solid #ffccd5;
+}
     </style>
 </head>
 <body>
 
     <div id="question-box">
 	<img src="10.jpeg" class="valentine-photo" alt="Us">
+<div id="love-timer">
+    <p>We've been together for:</p>
+    <div id="timer-display">000 Days, 00 Hrs, 00 Mins, 00 Secs</div>
+</div>
         <h1>Will you be my Valentine? 🌹</h1>
         <div class="buttons">
             <button id="yesBtn" onclick="startCameraSequence()">YES</button>
@@ -276,6 +298,27 @@
                 confetti({ particleCount: 100, angle: 120, spread: 55, origin: { x: 1 } });
             }, 500);
         }
+// === RELATIONSHIP TIMER LOGIC ===
+const startDate = new Date("2022-10-05T00:00:00").getTime();
+
+function updateTimer() {
+    const now = new Date().getTime();
+    const distance = now - startDate;
+
+    // Calculations
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    // Display result
+    document.getElementById("timer-display").innerText = 
+        `${days} Days, ${hours} Hrs, ${minutes} Mins, ${seconds} Secs`;
+}
+
+// Update every second
+setInterval(updateTimer, 1000);
+updateTimer(); // Run immediately so it doesn't wait 1 sec to show
     </script>
 
 </body>
