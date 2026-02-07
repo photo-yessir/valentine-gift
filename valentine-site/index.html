@@ -1,31 +1,134 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>For You</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incoming Transmission...</title>
+    <style>
+        body {
+            background-color: #1a1a1a; /* Dark Grey/Black */
+            color: #00ff41; /* Hacker Green or telegraph amber */
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            animation: blink 1.5s infinite;
+        }
+
+        p {
+            font-size: 1rem;
+            margin-bottom: 30px;
+            max-width: 500px;
+            line-height: 1.5;
+        }
+
+        /* The Input Field */
+        input {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid #00ff41;
+            color: white;
+            font-size: 1.5rem;
+            text-align: center;
+            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+            outline: none;
+            letter-spacing: 3px;
+            font-family: monospace;
+        }
+
+        input::placeholder {
+            color: #444;
+            font-size: 1rem;
+        }
+
+        /* The Button */
+        button {
+            margin-top: 30px;
+            padding: 15px 40px;
+            background: #00ff41;
+            color: black;
+            font-weight: bold;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            background: white;
+        }
+
+        .error-msg {
+            color: #ff3333; /* Red */
+            margin-top: 20px;
+            display: none; /* Hidden by default */
+            font-weight: bold;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>I have a message for you...</h1>
-        <div class="envelope-area">
-            <div style="font-size: 100px;">💌</div>
-        </div>
-        <p></p>
-       
-    </div>
-<audio id="bgMusic" loop>
-    <source src="song.mp3" type="audio/mpeg">
-</audio>
 
-<script>
-    function openEnvelope() {
-        var audio = document.getElementById("bgMusic");
-        audio.play(); 
-        // Then do the animation or page transition
-        setTimeout(() => { window.location.href = 'gallery.html'; }, 1000); 
-    }
-</script>
+    <h1>🛑 Signal Locked 🛑</h1>
+    
+    <p>A secure message has been intercepted.</p>
+    <p>Clue : First Time We Did Something</p>
+    <p>Decipher the date to unlock the channel.</p>
 
-<button onclick="openEnvelope()">Open Letter 💌</button>
+    <input type="text" id="code-input" placeholder=". - . -  . - . -" autocomplete="off">
+
+    <button onclick="checkCode()">Decrypt</button>
+
+    <p id="error" class="error-msg">⚠️ INCORRECT SIGNAL ⚠️</p>
+
+    <script>
+        function checkCode() {
+            var input = document.getElementById("code-input").value.trim(); // Removes extra spaces
+            
+            // ============================================
+            // 👇 PASTE YOUR MORSE CODE HERE INSIDE THE QUOTES 👇
+            // Example: ".-- .----" (Make sure to keep the spaces between letters!)
+            var secretCode = "01/10/2025"; 
+            // ============================================
+
+            if (input === secretCode) {
+                // SUCCESS: Redirects to your envelope page
+                window.location.href = "envelope.html"; 
+            } else {
+                // FAIL: Show error message
+                var error = document.getElementById("error");
+                error.style.display = "block";
+                
+                // Shake animation for fun
+                var inputField = document.getElementById("code-input");
+                inputField.style.transform = "translateX(10px)";
+                setTimeout(() => { inputField.style.transform = "translateX(-10px)"; }, 100);
+                setTimeout(() => { inputField.style.transform = "translateX(0px)"; }, 200);
+            }
+        }
+    </script>
+
 </body>
 </html>
