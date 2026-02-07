@@ -125,11 +125,25 @@
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
+/* PASTE THIS INSIDE <style> */
+.valentine-photo {
+    width: 500px;            /* Makes it small */
+    height: 500px;           /* Keeps it square (or remove this line for original shape) */
+    object-fit: cover;       /* Crops it perfectly if square */
+    border: 5px solid white; /* The white frame */
+    border-radius: 15px;     /* Rounded corners */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2); /* 3D Shadow effect */
+    margin-bottom: 15px;     /* Space between photo and question */
+    display: block;          /* Ensures it sits on its own line */
+    margin-left: auto;       /* Centers it */
+    margin-right: auto;      /* Centers it */
+}
     </style>
 </head>
 <body>
 
     <div id="question-box">
+	<img src="10.jpeg" class="valentine-photo" alt="Us">
         <h1>Will you be my Valentine? 🌹</h1>
         <div class="buttons">
             <button id="yesBtn" onclick="startCameraSequence()">YES</button>
